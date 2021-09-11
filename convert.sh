@@ -1,42 +1,64 @@
 #!/bin/bash
 
+## Author:Brycen Medart
+## URL:https://treantlabs.com
+## Version: 1.0
+## License: MIT License
+
+##--------------
+# Argument Variables - Do not change unless use case is understood
+##--------------------
+
 #File Directory Parameter
 m_path="$1"
 
-#File Name Parameter
-m_name="$2"
-
 #File Category Parameter - ie (Adult Movie, Shows, etc..)
-m_cat="$3"
+m_cat="$2"
 
 #File Full Path Parameter
-m_fpath="$4"
+m_fpath="$3"
 
-#Video File Save Folder. Alter this value to match your environment
+#Array of Movie ext types
+ext_array=("avi" "flv" "mkv" "mov" "mp4" "wmv")
+
+##-------------
+#Global change variables - Change to configure for your environment.
+##--------------------
+
+#Remove converted local file after transfer 0=no 1=yes
+remove_file=1
+
+#Video File Save Folder, alter to save converted movies to new location.
 m_saveFolder="/home/brymed/Videos/temp"
 
-#Local Information
-rsa_keyName="piplex.txt"
+#SSH Key file location/name
+rsa_keyName=".ssh/id_rsa.pub"
 
-#Remote Server Information For SFTP Transfer. Alter these values to match your environment
+#Remote Server Information For SFTP Transfer. Alter these values to match your environment.
 enable_transfer=1
 remote_ip="192.168.1.121"
 remote_username="pi"
 remote_saveFolder="/media/PIPLEX"
 
 function transfer_file() {
-      echo "in transfer"
+
       #Assign Argument to variable
-      file="$1"
-      echo $file
-      #//TODO change key file to point to correct ssh key
-      #scp -i ~/.ssh/$rsa_keyName $file $remote_username@$remote_ip:/$remote_saveFolder/$m_cat
+      file=$1
+
+      scp -i ~/$rsa_keyName $file $remote_username@$remote_ip:/$remote_saveFolder/$m_cat
+
+      #Remove file after transfer if $remove_file is set
+      sleep 1
+      if [ $remove_file -eq 1 ]; then
+            rm "$file"
+      fi
 }
 
 function convert_file() {
 
       #Argument Passed From For Loop
       i=$1
+
       #GET FILE EXTENSION FROM FILE
       file_ext="${i##*.}"
 
@@ -45,21 +67,33 @@ function convert_file() {
 
       #If not a directory
       if [ ! -d "$i" ]; then
-            if [[ $file_ext == "mp4" ]] || [[ $file_ext == "avi" ]] || [[ $file_ext == "mkv" ]] || [[ $file_ext == "wmv" ]] || [[ $file_ext == "flv" ]] || [[ $file_ext == "mov" ]]; then
 
-                  #ASSIGN VIDEO CODECS TO VARIABLES
+            # Search array for video ext
+            if [[ " ${ext_array[@]} " =~ " ${file_ext} " ]]; then
+
+                  #Assign Video/Audio codecs to variables
                   codecV=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=nokey=1:noprint_wrappers=1 "$i")
                   codecA=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of default=nokey=1:noprint_wrappers=1 "$i")
 
-                  #IF H264 & MP4, TRANSFER FILE WITHOUT CONVERSION
+                  #IF H264 & MP4, transfer without conversion
                   if [[ "$codecV" == "h264" ]] && [[ $file_ext == "mp4" ]]; then
-                        echo "Match - h264/mp4, mv file to folder to ftp"
+                        chmod 777 "$i"
+                        mv "$i" "$m_saveFolder"
 
-                  #ELSE RECODE TO H264 & MP4
+                        #If transfer is enabled then transfer file
+                        if [ $enable_transfer -eq 1 ]; then
+                              transfer_file "$m_saveFolder/$i"
+                        fi
+
+                  #RECODE TO H264 & MP4
                   else
-                        echo "Not h264 or .mp4 "
+
+                        #Use ffmpeg to convert video, see https://ffmpeg.org/ffmpeg.html for alternate values
                         ffmpeg -i "$i" -c:v libx264 -preset fast -crf 22 -c:a aac "${i%.*}.mp4"
-                        while pidof /usr/bin/ffmpeg; do sleep 10; done >/dev/null #sleep until movie is processed
+
+                        #Sleep until movie is processed !important
+                        while pidof /usr/bin/ffmpeg; do sleep 10; done >/dev/null
+
                         chmod 777 "${i%.*}.mp4"
                         mv "${i%.*}.mp4" "$m_saveFolder"
                         rm "$i"
@@ -71,8 +105,6 @@ function convert_file() {
                   fi
 
             elif [ $file_ext == "srt" ]; then
-                  echo "Exists - srt file"
-
                   mv "$i" "$m_saveFolder/$file_name.en.srt"
 
                   if [ $enable_transfer -eq 1 ]; then
@@ -84,17 +116,15 @@ function convert_file() {
       fi
 }
 
-cd "$m_fpath"
-
 #Loop through files in m_fpath location and send to convert_file function for processing
+cd "$m_fpath"
 for i in *; do
-      convert_file $i
+      convert_file "$i"
 done
 
 #If the movie path does not equal the save folder path delete movie folder
-if [ $m_fpath != $m_saveFolder ]; then
-      rmdir $m_fpath
+if [ "${m_fpath%/*}" != "$m_saveFolder" ]; then
+      rmdir "$m_fpath"
 fi
 
-#//TODO Remove when complete
 read -n 1 -r -s -p $'Press enter to continue...\n'
