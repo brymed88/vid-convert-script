@@ -41,7 +41,7 @@ Within qBittorrent Under Settings->Downloads-> Run External Program On Torrent C
 
 Note: In the below example "/home/Dev/vid-convert-script/convert.sh" is the location of this script on my file system. Depending on the git clone location, this will need to be adjusted.
 
-/bin/sh /home/Dev/vid-convert-script/convert.sh "%D" "%L" "%R"
+/home/Dev/vid-convert-script/convert.sh "%D" "%L" "%R"
 
 After torrent finishes downloading qBittorrent will kick off the convert.sh script and process the video conversion.
 
