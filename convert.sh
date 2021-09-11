@@ -44,8 +44,7 @@ function transfer_file() {
 
       #Assign Argument to variable
       file=$1
-
-      scp -i ~/$rsa_keyName $file $remote_username@$remote_ip:/$remote_saveFolder/$m_cat
+      scp -i ~/$rsa_keyName "$file" $remote_username@$remote_ip:/$remote_saveFolder/$m_cat
 
       #Remove file after transfer if $remove_file is set
       sleep 1
@@ -78,6 +77,7 @@ function convert_file() {
                   #IF H264 & MP4, transfer without conversion
                   if [[ "$codecV" == "h264" ]] && [[ $file_ext == "mp4" ]]; then
                         chmod 777 "$i"
+                       
                         mv "$i" "$m_saveFolder"
 
                         #If transfer is enabled then transfer file
@@ -111,6 +111,7 @@ function convert_file() {
                         transfer_file "$m_saveFolder/$file_name.en.srt"
                   fi
             else
+           
                   rm "$i"
             fi
       fi
@@ -123,7 +124,7 @@ for i in *; do
 done
 
 #If the movie path does not equal the save folder path delete movie folder
-if [ "${m_fpath%/*}" != "$m_saveFolder" ]; then
+if [ "$m_fpath" != "$m_saveFolder" ]; then
       rmdir "$m_fpath"
 fi
 
