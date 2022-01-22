@@ -43,6 +43,12 @@ Note: In the below example "/home/Dev/vid-convert-script/convert.sh" is the loca
 
 /home/Dev/vid-convert-script/convert.sh "%D" "%L" "%R"
 
+OR
+
+gnome-terminal -- /home/Dev/vid-convert-script/convert.sh "%D" "%L" "%R"
+
+If seeing the output is desired.
+
 After torrent finishes downloading qBittorrent will kick off the convert.sh script and process the video conversion.
 
 ----------------------------------------------------------------------------------------------------------------

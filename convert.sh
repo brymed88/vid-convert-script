@@ -119,7 +119,8 @@ fi
 }
 
 #CD into directory to avoid unwanted actions
-if [[ -d "$f_path" ]] then
+
+if [[ -d "$f_path" ]]; then
 cd $f_path
 
       #If rename is enabled, loop files and remove characters specified by above variables old_char and new_char
@@ -155,4 +156,5 @@ if [[ "$f_path" != "$path" ]] && [[ -d "$f_path" ]] && [[ -z "$(ls -A $f_path)" 
 fi
 
 fi
+echo "Processing Complete"
 read -n 1 -r -s -p $'Press enter to continue...\n'
