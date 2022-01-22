@@ -119,32 +119,33 @@ fi
 }
 
 #CD into directory to avoid unwanted actions
+if [[ -d "$f_path" ]] then
 cd $f_path
 
-#If rename is enabled, loop files and remove characters specified by above variables old_char and new_char
-if [ $name_rewrite -eq 0 ]; then
-      rename_files
-fi
-
-#Loop through files in f_path location and send to convert_file function for processing
-for i in *; do
-
- #If not a directory
-if [ ! -d "$i" ]; then
-
-#GET FILE EXTENSION FROM FILE
-file_ext="${i##*.}"
-            
-      # Search array for video ext
-      if [[ " ${ext_array[*]} " =~ " ${file_ext} " ]]; then
-            convert_file "$i"
-      else
-            #make sure it is a file
-            if [ -f $i ]; then
-                  rm $i
-                  echo "$i has been removed"
-            fi
+      #If rename is enabled, loop files and remove characters specified by above variables old_char and new_char
+      if [ $name_rewrite -eq 0 ]; then
+            rename_files
       fi
+
+      #Loop through files in f_path location and send to convert_file function for processing
+      for i in *; do
+
+      #If not a directory
+      if [ ! -d "$i" ]; then
+
+      #GET FILE EXTENSION FROM FILE
+      file_ext="${i##*.}"
+            
+            # Search array for video ext
+            if [[ " ${ext_array[*]} " =~ " ${file_ext} " ]]; then
+                  convert_file "$i"
+            else
+                  #make sure it is a file
+                  if [ -f $i ]; then
+                        rm $i
+                        echo "$i has been removed"
+                  fi
+            fi
 fi
 done
 
@@ -153,4 +154,5 @@ if [[ "$f_path" != "$path" ]] && [[ -d "$f_path" ]] && [[ -z "$(ls -A $f_path)" 
       rmdir "$f_path"
 fi
 
+fi
 read -n 1 -r -s -p $'Press enter to continue...\n'
