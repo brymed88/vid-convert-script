@@ -101,6 +101,22 @@ codecA=$(ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -o
 #RECODE TO H264 & MP4 and reduce size
 #Use ffmpeg to convert video, see https://ffmpeg.org/ffmpeg.html for alternate values
 
+if [ $file_ext == "mp4" ]; then
+
+echo "Compressing File - $i"
+ffmpeg -i "$i" -c:v libx264 -preset medium -crf 24 -c:a aac "t$file_name.mp4"
+
+#Sleep until movie is processed !important
+while pidof /usr/bin/ffmpeg; do sleep 10; done >/dev/null
+
+chmod 777 "t$file_name.mp4"
+rm "$i"
+
+#rename back to original
+mv "t$file_name.mp4" "$file_name.mp4"
+
+else
+
 echo "Converting File - $i"
 ffmpeg -i "$i" -c:v libx264 -preset medium -crf 24 -c:a aac "$file_name.mp4"
 
@@ -109,19 +125,21 @@ while pidof /usr/bin/ffmpeg; do sleep 10; done >/dev/null
 
 chmod 777 "$file_name.mp4"
 rm "$i"
+      
+fi
 
-      #If transfer is enabled then transfer file
+#If transfer is enabled then transfer file
       if [ $enable_transfer -eq 1 ]; then
             transfer_file "$f_path/$file_name.mp4"
       fi
-     
+
 fi
 }
 
 #CD into directory to avoid unwanted actions
 
 if [[ -d "$f_path" ]]; then
-cd $f_path
+cd "$f_path"
 
       #If rename is enabled, loop files and remove characters specified by above variables old_char and new_char
       if [ $name_rewrite -eq 0 ]; then
