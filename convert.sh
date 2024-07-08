@@ -25,23 +25,20 @@ ext_array=("srt" "avi" "flv" "mkv" "mov" "mp4" "wmv" "en.srt")
 #Enable file name rewrite to remove certain characters programmatically
 sanitize_name=1
 
-#Remove converted local file after transfer 0=no 1=yes
+#Remove file(s) after transfer 0=no 1=yes
 remove_file_after_transfer=0
 remove_original_after_conversion=0
 remove_parent_folder=0
 remove_non_movie_files=1
-
-#Video File Save Folder, alter to save converted movies to new location.
-m_saveFolder="/home/brymed/tor"
 
 #SSH Key file location/name
 rsa_keyName=".ssh/id_rsa.pub"
 
 #Remote Server Information For SFTP Transfer. Alter these values to match your environment.
 enable_transfer=1
-remote_ip="192.168.1.121"
-remote_username="brymed88"
-remote_saveFolder="/media/MediaFiles/plex/media/"
+remote_ip="your ip"                      #change to valid ip address
+remote_username="your username"          # change to valid username
+remote_saveFolder="save folder location" #change to valid remote location
 
 function print_msg() {
       type="$1"
