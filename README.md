@@ -22,18 +22,16 @@ Note: In the below example "/home/Dev/vid-convert-script/convert.sh" is the loca
 
 Change the below values
 
-* Save path - location where video is stored ie "/home/user/Downloads"
 * Torrent label - Torrent label ie shows, movies etc..
     Note: Label that is used in the FTP transfer file path. For example if label is "Shows" the ftp transfer would save to /remoteip/folder/Shows. If videos are not categorized this way on your system leave quotes empty ""
 * Full save path - full save path for video file ie "/home/user/Downloads/mountain men". If the video is not under a subfolder, this value would be "/home/user/Downloads/mountain men.avi"
 
-bash /home/Dev/vid-convert-script/convert.sh "/home/user/Downloads" "Shows" "/home/user/Downloads/mountain men"
+bash /home/Dev/vid-convert-script/convert.sh "Shows" "/home/user/Downloads/mountain men"
 
 ----------------------------------------------------------------------------------------------------------------
 
 qBITTORRENT USAGE:
 
-%D - Save Path
 %L - Torrent Label
 %R - Full Save Path - includes folder torrent is in
 
@@ -45,7 +43,7 @@ Note: In the below example "/home/Dev/vid-convert-script/convert.sh" is the loca
 
 OR
 
-gnome-terminal -- /home/Dev/vid-convert-script/convert.sh "%D" "%L" "%R"
+gnome-terminal -- /home/Dev/vid-convert-script/convert.sh "%L" "%R"
 
 If seeing the output is desired.
 
